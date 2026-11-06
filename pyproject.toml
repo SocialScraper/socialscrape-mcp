@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "socialscrape-mcp"
+version = "0.1.1"
+description = "MCP server for SocialScrape: social media data for Claude, Cursor and other agents"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = ["httpx>=0.27,<1"]
+
+[project.optional-dependencies]
+# The hosted (streamable HTTP) server. stdio needs only httpx.
+http = ["starlette>=0.40", "uvicorn>=0.30"]
+test = ["pytest>=8", "starlette>=0.40", "uvicorn>=0.30"]
+
+[project.urls]
+Homepage = "https://socialscrape.dev"
+Documentation = "https://socialscrape.dev/docs"
+Repository = "https://github.com/SocialScraper/socialscrape-mcp"
+
+[project.scripts]
+socialscrape-mcp = "socialscrape_mcp.cli:main"
+
+[tool.setuptools]
+packages = ["socialscrape_mcp"]
+
+[tool.setuptools.package-data]
+socialscrape_mcp = ["catalog.json"]
