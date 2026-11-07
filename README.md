@@ -29,7 +29,7 @@ subprocess over stdio. SocialScrape does not run a hosted MCP server, so there i
     "env": { "SOCIALSCRAPE_API_KEY": "ss_live_..." } } } }
 ```
 
-Get a key at <https://socialscrape.dev/app>. Tool discovery works without a key; a tool call without one
+Get a key at <https://socialscrape.dev/sign-up?utm_source=github&utm_medium=repo&utm_campaign=socialscrape-mcp>. Tool discovery works without a key; a tool call without one
 explains how to add it.
 
 **Fewer tools.** Some clients cap the number of tools (Cursor warns past 40). Narrow the list in the `env`
