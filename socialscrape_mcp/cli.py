@@ -55,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
         uvicorn.run(create_app(settings), host=args.host, port=args.port, log_level="warning")
         return 0
     if not settings.api_key:
-        print("socialscrape-mcp: set SOCIALSCRAPE_API_KEY (get a key at https://socialscrape.dev/app). "
+        print("socialscrape-mcp: set SOCIALSCRAPE_API_KEY (get a key at https://socialscrape.dev/sign-up?utm_source=socialscrape-mcp&utm_medium=cli&utm_campaign=socialscrape-mcp). "
               "Starting anyway: tools list, but calls will explain the missing key.", file=sys.stderr)
     serve_stdio(McpServer(load_catalog(), settings), filt)
     return 0

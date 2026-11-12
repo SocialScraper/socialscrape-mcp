@@ -17,13 +17,19 @@
    "transport": {
     "type": "stdio"
    },
-   "version": "0.1.1"
+   "version": "0.1.3"
+  }
+ ],
+ "remotes": [
+  {
+   "type": "streamable-http",
+   "url": "https://api.socialscrape.dev/mcp"
   }
  ],
  "repository": {
   "source": "github",
   "url": "https://github.com/SocialScraper/socialscrape-mcp"
  },
- "version": "0.1.1",
- "websiteUrl": "https://socialscrape.dev"
+ "version": "0.1.3",
+ "websiteUrl": "https://socialscrape.dev/?utm_source=mcp-registry&utm_medium=listing&utm_campaign=socialscrape-mcp"
 }

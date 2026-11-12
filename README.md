@@ -1,7 +1,7 @@
 # socialscrape-mcp
 
 The SocialScrape MCP server: social media data (profiles, posts, comments, search, ads,
-transcripts) for Claude, Cursor and any other MCP client that starts a local server.
+transcripts) for Claude, ChatGPT, Cursor and any other MCP client. SocialScrape hosts this server at `https://api.socialscrape.dev/mcp`; this package is the same server to run on your own machine.
 
 It is **generated from SocialScrape's endpoint registry** and grouped so an agent sees a usable number of tools instead of one per endpoint:
 
@@ -20,8 +20,26 @@ error code, a `retryable` flag and what to do next.
 
 ## Use it
 
-The server runs on your own machine. Your MCP client (Claude Desktop, Claude Code, Cursor) starts it as a
-subprocess over stdio. SocialScrape does not run a hosted MCP server, so there is no MCP URL to connect to.
+**Hosted (the main way).** SocialScrape runs this server at `https://api.socialscrape.dev/mcp` (streamable HTTP). There are two ways to sign in.
+
+1. Sign in, with no key to copy. Add the URL as a connector, then sign in with your SocialScrape account and approve the connection.
+   - Claude: Settings, Connectors, Add custom connector, paste the URL.
+   - ChatGPT: add a connector with the URL and choose OAuth.
+   - Cursor: add a server with the URL and sign in when asked.
+   - Claude Code: `claude mcp add --transport http socialscrape https://api.socialscrape.dev/mcp`, then `/mcp` to sign in.
+2. An API key in a header, `x-api-key: ss_live_...`.
+   - Claude Code: `claude mcp add --transport http socialscrape https://api.socialscrape.dev/mcp --header "x-api-key: ss_live_..."`
+   - Cursor, in `~/.cursor/mcp.json`:
+
+```json
+{ "mcpServers": { "socialscrape": {
+    "url": "https://api.socialscrape.dev/mcp",
+    "headers": { "x-api-key": "ss_live_..." } } } }
+```
+
+Each signed-in connection shows in the dashboard as a key named "MCP connector". Calls are charged to the team like any key, and revoking that key disconnects that connector. The tools are the same as this package's. Add `?platforms=github,threads` or `?toolsets=core` to the URL to narrow the list.
+
+**Local (this package).** For offline clients, or if you want the server on your own machine, your MCP client starts it as a subprocess over stdio:
 
 ```json
 { "mcpServers": { "socialscrape": {
@@ -43,11 +61,10 @@ block:
 
 With `core` alone an agent still reaches every endpoint through `describe` and `call_endpoint`.
 
-**Serve it over HTTP yourself.** For a client that can only reach a URL, install the extra and run the
-server on a host you control: `pip install 'socialscrape-mcp[http]'`, then `socialscrape-mcp http --host
+**Serve it over HTTP yourself.** To run your own copy of the hosted server on a host you control, install the extra: `pip install 'socialscrape-mcp[http]'`, then `socialscrape-mcp http --host
 127.0.0.1 --port 8080`. Each request carries its own key in the `x-api-key` header (or
-`Authorization: Bearer ...`), and `?platforms=` and `?toolsets=` narrow the tools. This is yours to run and
-secure; SocialScrape does not offer it as a service.
+`Authorization: Bearer ...`), and `?platforms=` and `?toolsets=` narrow the tools. This copy is yours to run and
+secure.
 
 ## Settings (environment)
 

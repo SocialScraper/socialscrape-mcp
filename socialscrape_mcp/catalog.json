@@ -582,7 +582,7 @@
   },
   {
    "credits": "standard",
-   "description": "A channel's Shorts, newest first or most popular: id, title and view count. YouTube's Shorts tab shows no length or date; `include_extras` adds them with likes and the description.",
+   "description": "A channel's Shorts, newest first or most popular: id, title and view count. YouTube's Shorts tab shows rounded views (`extra.views_approximate`) and no length or date; `include_extras` adds exact views, length, publish date, likes and the description.",
    "examples": [
     {
      "handle": "MrBeast"
@@ -656,7 +656,7 @@
       "includeExtras"
      ],
      "default": false,
-     "description": "Also fetch length, publish date, likes and description per Short (slower, more errors).",
+     "description": "Also fetch exact views, length, publish date, likes and description per Short (slower, more errors).",
      "location": "query",
      "name": "include_extras",
      "required": false,
@@ -725,7 +725,7 @@
   },
   {
    "credits": "standard",
-   "description": "A channel's uploads, newest first or most popular. Page with `cursor` (the continuationToken).",
+   "description": "A channel's uploads, newest first or most popular. Page with `cursor` (the continuationToken). The tab prints rounded views and \"9 days ago\" (flagged `extra.views_approximate` and `extra.published_at_approximate`); `include_extras` swaps in exact views, likes, description and publish time, one extra request per video (about 2 s more a page).",
    "examples": [
     {
      "handle": "MrBeast"
@@ -799,7 +799,7 @@
       "includeExtras"
      ],
      "default": false,
-     "description": "Also fetch likes, comment count and description per video (slower, more errors). The video endpoint returns everything.",
+     "description": "Also fetch exact views, likes, description and publish time per video (slower, more errors). Comment counts come from the video endpoint.",
      "location": "query",
      "name": "include_extras",
      "required": false,
@@ -1398,7 +1398,7 @@
   },
   {
    "credits": "standard",
-   "description": "YouTube has no trending page; this is the Shorts feed (about ten Shorts a page, different on each call, not a ranked chart), each with its title, channel, counts and date.",
+   "description": "YouTube has no trending page; this is the Shorts feed (50 Shorts a page, different on each call, not a ranked chart), each with its title, channel, counts and date. Page with `cursor` for more.",
    "examples": [
     {}
    ],
@@ -1485,7 +1485,7 @@
   },
   {
    "credits": "standard",
-   "description": "Title, description, stats, duration, channel, thumbnails, chapters, caption tracks and whether YouTube marks it as paid promotion (`is_sponsored`, null when YouTube's player could not be read for this request). Views, likes and the publish time are exact; the comment and subscriber counts are the abbreviated figures YouTube shows, with the display text in `extra`. Works for Shorts and lives.",
+   "description": "Title, description, stats, duration, channel, thumbnails, chapters, caption tracks, the most-replayed segments, the links in the description, up to 20 related videos, the note YouTube shows on altered or generated media (`extra.ai_disclosure`) and whether YouTube marks it as paid promotion (`is_sponsored`, null when YouTube's player could not be read for this request). Views, likes and the publish time are exact; the comment and subscriber counts are the abbreviated figures YouTube shows, with the display text in `extra`. Works for Shorts and lives.",
    "examples": [
     {
      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
@@ -2283,6 +2283,214 @@
   },
   {
    "credits": "standard",
+   "description": "The accounts that follow a creator, newest follower first, each with its name, avatar, bio, verified flag and follower, following, video and like counts. A page holds 30 accounts; follow `cursor` for older followers. `parent` is the creator's profile, which carries the follower total. A private account answers `private`.",
+   "examples": [
+    {
+     "handle": "khaby.lame"
+    }
+   ],
+   "group": "tiktok",
+   "id": "tiktok.profile.followers",
+   "kind": "platform",
+   "method": "GET",
+   "mode": "sync",
+   "one_of": [
+    [
+     "handle",
+     "id"
+    ]
+   ],
+   "paginated": true,
+   "params": [
+    {
+     "aliases": [
+      "username"
+     ],
+     "description": "Username, with or without the leading @.",
+     "location": "query",
+     "name": "handle",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "aliases": [
+      "user_id",
+      "secUid",
+      "sec_uid"
+     ],
+     "description": "TikTok user id (numeric) or secUid.",
+     "location": "query",
+     "name": "id",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "aliases": [
+      "continuationToken",
+      "continuation_token",
+      "next_max_id",
+      "max_id",
+      "max_cursor",
+      "min_time",
+      "after",
+      "page_token",
+      "pageToken",
+      "paginationToken",
+      "next_page_id",
+      "page"
+     ],
+     "description": "Opaque cursor from the previous page; pass it back unchanged.",
+     "location": "query",
+     "name": "cursor",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Smaller response: drops null fields and `extra`.",
+     "location": "query",
+     "name": "trim",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Also return the platform's original object as `raw`.",
+     "location": "query",
+     "name": "raw",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "aliases": [
+      "cache_max_age"
+     ],
+     "common": true,
+     "description": "Serve a cached result fetched within this many days, for 0 credits. ScrapeCreators' `cache_max_age=7d` spelling is accepted too.",
+     "location": "query",
+     "maximum": 30,
+     "minimum": 0,
+     "name": "max_age_days",
+     "required": false,
+     "type": "number"
+    }
+   ],
+   "path": "/v1/tiktok/profile/followers",
+   "regional": false,
+   "resource": "profile.followers",
+   "response": "ListPage[Profile]",
+   "status": "ga",
+   "summary": "TikTok followers",
+   "timeout_seconds": 60.0
+  },
+  {
+   "credits": "standard",
+   "description": "The accounts a creator follows, each with its name, avatar, bio, verified flag and follower, following, video and like counts. A page holds 30 accounts; follow `cursor` for more. `parent` is the creator's profile. A creator who hides the list, and a private account, answer `private` (TikTok lets a creator keep the list to themselves, so many large accounts do).",
+   "examples": [
+    {
+     "handle": "nasa"
+    }
+   ],
+   "group": "tiktok",
+   "id": "tiktok.profile.following",
+   "kind": "platform",
+   "method": "GET",
+   "mode": "sync",
+   "one_of": [
+    [
+     "handle",
+     "id"
+    ]
+   ],
+   "paginated": true,
+   "params": [
+    {
+     "aliases": [
+      "username"
+     ],
+     "description": "Username, with or without the leading @.",
+     "location": "query",
+     "name": "handle",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "aliases": [
+      "user_id",
+      "secUid",
+      "sec_uid"
+     ],
+     "description": "TikTok user id (numeric) or secUid.",
+     "location": "query",
+     "name": "id",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "aliases": [
+      "continuationToken",
+      "continuation_token",
+      "next_max_id",
+      "max_id",
+      "max_cursor",
+      "min_time",
+      "after",
+      "page_token",
+      "pageToken",
+      "paginationToken",
+      "next_page_id",
+      "page"
+     ],
+     "description": "Opaque cursor from the previous page; pass it back unchanged.",
+     "location": "query",
+     "name": "cursor",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Smaller response: drops null fields and `extra`.",
+     "location": "query",
+     "name": "trim",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Also return the platform's original object as `raw`.",
+     "location": "query",
+     "name": "raw",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "aliases": [
+      "cache_max_age"
+     ],
+     "common": true,
+     "description": "Serve a cached result fetched within this many days, for 0 credits. ScrapeCreators' `cache_max_age=7d` spelling is accepted too.",
+     "location": "query",
+     "maximum": 30,
+     "minimum": 0,
+     "name": "max_age_days",
+     "required": false,
+     "type": "number"
+    }
+   ],
+   "path": "/v1/tiktok/profile/following",
+   "regional": false,
+   "resource": "profile.following",
+   "response": "ListPage[Profile]",
+   "status": "ga",
+   "summary": "TikTok following",
+   "timeout_seconds": 60.0
+  },
+  {
+   "credits": "standard",
    "description": "Whether the user is live now, with the room's details when they are.",
    "examples": [
     {
@@ -2349,7 +2557,73 @@
   },
   {
    "credits": "standard",
-   "description": "The newest videos of a public account, from TikTok's embed page for it. One page of about 10 (pinned videos first, then newest first), and no cursor: `has_more` is false because more cannot be fetched, not because the account has no more. Each video has its id, caption, hashtags, cover, a signed play URL, size and play count (TikTok rounds it to two significant digits; `extra.views_rounded`), and a date taken from the video id (`extra.published_at_from_id`). Likes, comments, shares and duration are not on that page and stay null; `is_pinned` is true for a pinned video that can be told from the order (it never over-reports). `parent` is the account. `sort=popular` is refused, and a numeric `id` cannot be looked up: pass `handle`. A private account answers `private`, and an account whose creator limits its audience answers `age_restricted`.",
+   "description": "The country TikTok recorded for an account's newest video, as a two-letter code in `location` and `extra.region`, with the account's name, avatar and counts. It describes that one video, not the account: it is not the country the account registered with and may not be where the person lives, and a creator who travels, or posts through a VPN, can show another country (`extra.region_source` is `newest_video`, `extra.region_video_id` names the video). If the newest video has no country the next two are tried. An account with no videos, or none that carries a country, answers `not_found`; a private account answers `private`. Looked up by `handle` only.",
+   "examples": [
+    {
+     "handle": "khaby.lame"
+    }
+   ],
+   "group": "tiktok",
+   "id": "tiktok.profile.region",
+   "kind": "platform",
+   "method": "GET",
+   "mode": "sync",
+   "one_of": [],
+   "paginated": false,
+   "params": [
+    {
+     "aliases": [
+      "username"
+     ],
+     "description": "Username, with or without the leading @.",
+     "location": "query",
+     "name": "handle",
+     "required": true,
+     "type": "string"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Smaller response: drops null fields and `extra`.",
+     "location": "query",
+     "name": "trim",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Also return the platform's original object as `raw`.",
+     "location": "query",
+     "name": "raw",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "aliases": [
+      "cache_max_age"
+     ],
+     "common": true,
+     "description": "Serve a cached result fetched within this many days, for 0 credits. ScrapeCreators' `cache_max_age=7d` spelling is accepted too.",
+     "location": "query",
+     "maximum": 30,
+     "minimum": 0,
+     "name": "max_age_days",
+     "required": false,
+     "type": "number"
+    }
+   ],
+   "path": "/v1/tiktok/profile/region",
+   "regional": false,
+   "resource": "profile.region",
+   "response": "Profile",
+   "status": "ga",
+   "summary": "TikTok profile region",
+   "timeout_seconds": 60.0
+  },
+  {
+   "credits": "standard",
+   "description": "An account's videos, newest first. How much you get depends on whether TikTok's full list answers, which comes and goes: it was open for about 15 minutes and then refused for at least the next 30 when we measured it, so plan for the shorter answer. When the list answers: 30 to a page with every count TikTok shows (plays, likes, comments, shares, saves), plus caption, hashtags, music, cover, duration, size and the play URL, and a `cursor` for the next page until `has_more` is false. When it refuses a first page asked by `handle`, the page comes from the account's embed page: about 10 videos, no `cursor`, `has_more` false because more cannot be fetched, play counts rounded to two significant digits (`extra.views_rounded`) and no other counts. A numeric `id` and pages after the first need the list, so while TikTok refuses it they answer `upstream_blocked` at no charge; ask again later. `is_pinned` marks pinned videos (set `include_pinned` to false to drop them) and `parent` is the account. `sort=popular` is refused. A private account answers `private`, and an account whose creator limits its audience answers `age_restricted`. Even from the full list TikTok rounds views, likes, comments and shares to three significant digits; saves are exact.",
    "examples": [
     {
      "handle": "khaby.lame"
@@ -2586,7 +2860,7 @@
   },
   {
    "credits": "standard",
-   "description": "Video search across TikTok. TikTok ignores sort and date filters: `sort` other than `relevance` is refused, and `date_posted` drops videos older than the window from each page (pages can be short or empty; follow `has_more`). `region` is TikTok's region hint, not a proxy country. TikTok now asks for a login on keyword search: when it does, the list is the public videos under the hashtag of your query instead, which are not keyword matches, and `parent` is that hashtag with the explanation as its `description` and `extra.fallback` set to `hashtag`.",
+   "description": "Video search across TikTok. TikTok ignores sort and date filters: `sort` other than `relevance` is refused, and `date_posted` drops videos older than the window from each page (pages can be short or empty; follow `has_more`). `region` is TikTok's region hint, not a proxy country. TikTok now asks for a login on keyword search: when it does, the list is the public videos under the hashtag of your query instead, which are not keyword matches, and `parent` is that hashtag with the explanation as its `description` and `extra.fallback` set to `hashtag`. TikTok gives views, likes, comments and shares rounded to three significant digits (22,026,689 views read as 22,000,000); saves are exact. A page holds up to 30 videos.",
    "examples": [
     {
      "query": "air fryer recipes"
@@ -2956,7 +3230,7 @@
   },
   {
    "credits": "standard",
-   "description": "",
+   "description": "Accounts matching a search. TikTok gives 10 accounts for one request, so a page holds 10; follow `cursor` for more.",
    "examples": [
     {
      "query": "cooking"
@@ -3126,7 +3400,7 @@
   },
   {
    "credits": "standard",
-   "description": "",
+   "description": "Videos that use a sound, 20 to a page. TikTok gives views, likes, comments and shares rounded to three significant digits (22,026,689 views read as 22,000,000); saves are exact.",
    "examples": [
     {
      "id": "7016547803243022337"
@@ -3318,7 +3592,7 @@
   },
   {
    "credits": "standard",
-   "description": "Metadata and engagement stats of one video or photo slideshow. `get_transcript=true` adds the native captions in `extra.transcript`; for AI transcription use `/v1/tiktok/video/transcript`.",
+   "description": "Metadata and engagement stats of one video or photo slideshow. `get_transcript=true` adds the native captions in `extra.transcript`; for AI transcription use `/v1/tiktok/video/transcript`. TikTok gives views, likes, comments and shares rounded to three significant digits (22,026,689 views read as 22,000,000); saves are exact.",
    "examples": [
     {
      "url": "https://www.tiktok.com/@khaby.lame/video/7137423965982592302"
@@ -3704,7 +3978,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -4292,7 +4566,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -4340,7 +4614,7 @@
   },
   {
    "credits": "standard",
-   "description": "Biography, links, follower and following counts and account flags. `stats.posts` is null here (Instagram's profile query leaves it out): use `profile/post-count`. Private accounts answer the profile with `is_private` true.",
+   "description": "Biography, links, follower and following counts, the post count and account flags. Instagram's profile query leaves the post count out, so it is read from the profile's embed page beside it (`stats.posts`, exact, `extra.is_estimated` false); when that page cannot be read, or only gives an abbreviated figure, `stats.posts` is null and `profile/post-count` can estimate it. Private accounts answer the profile with `is_private` true.",
    "examples": [
     {
      "handle": "nasa"
@@ -4363,6 +4637,14 @@
      "name": "handle",
      "required": true,
      "type": "string"
+    },
+    {
+     "default": true,
+     "description": "Set false to skip the extra page read and leave `stats.posts` null.",
+     "location": "query",
+     "name": "include_post_count",
+     "required": false,
+     "type": "boolean"
     },
     {
      "common": true,
@@ -4946,6 +5228,94 @@
   },
   {
    "credits": "standard",
+   "description": "Instagram's own hashtag search for the words: the hashtags that start with them, in Instagram's order, about 50 in one page with no cursor. Each carries its id, `url` and post count (`extra.post_count`, and `extra.post_count_label`, the rounded label Instagram prints; small tags read `100+`). An unusual word answers an empty list. Accounts, places and keyword suggestions are not in the answer. For a hashtag's posts use `search/hashtag`; for accounts `search/profiles`.",
+   "examples": [
+    {
+     "query": "nike"
+    }
+   ],
+   "group": "instagram",
+   "id": "instagram.search",
+   "kind": "platform",
+   "method": "GET",
+   "mode": "sync",
+   "one_of": [],
+   "paginated": true,
+   "params": [
+    {
+     "aliases": [
+      "keyword",
+      "q"
+     ],
+     "description": "The word or start of a word to find hashtags for, with or without #.",
+     "location": "query",
+     "name": "query",
+     "required": true,
+     "type": "string"
+    },
+    {
+     "aliases": [
+      "continuationToken",
+      "continuation_token",
+      "next_max_id",
+      "max_id",
+      "max_cursor",
+      "min_time",
+      "after",
+      "page_token",
+      "pageToken",
+      "paginationToken",
+      "next_page_id",
+      "page"
+     ],
+     "description": "Opaque cursor from the previous page; pass it back unchanged.",
+     "location": "query",
+     "name": "cursor",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Smaller response: drops null fields and `extra`.",
+     "location": "query",
+     "name": "trim",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Also return the platform's original object as `raw`.",
+     "location": "query",
+     "name": "raw",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "aliases": [
+      "cache_max_age"
+     ],
+     "common": true,
+     "description": "Serve a cached result fetched within this many days, for 0 credits. ScrapeCreators' `cache_max_age=7d` spelling is accepted too.",
+     "location": "query",
+     "maximum": 30,
+     "minimum": 0,
+     "name": "max_age_days",
+     "required": false,
+     "type": "number"
+    }
+   ],
+   "path": "/v1/instagram/search",
+   "regional": false,
+   "resource": "search",
+   "response": "ListPage[Suggestion]",
+   "status": "ga",
+   "summary": "Instagram hashtag suggestions",
+   "timeout_seconds": 30.0
+  },
+  {
+   "credits": "standard",
    "description": "Public posts and reels for an exact hashtag that a web search has indexed (DuckDuckGo's results, not Google's), best effort and not a complete hashtag feed. The cursor is the next results page and cannot go past 11. Each result is read through the Instagram post endpoint for caption, author, media and counts (`enrich`, on by default; a post that no longer exists is dropped). `date_posted` takes day, week, month or year. When the search provider asks for human verification on every try the call fails and can be retried.",
    "examples": [
     {
@@ -5146,6 +5516,102 @@
    "response": "ListPage[Post]",
    "status": "ga",
    "summary": "Instagram popular topic",
+   "timeout_seconds": 30.0
+  },
+  {
+   "credits": "standard",
+   "description": "Accounts for a name or keyword, from the Instagram pages a web search has indexed (DuckDuckGo's results, not Google's and not Instagram's own ranking), best effort and not a complete list. Each result states the account's name and rounded follower, following and post counts (`extra.stats_approximate`). The first 10 on a page are then read through the Instagram profile endpoint for exact counts, bio, links and picture (`enrich`, on by default; an account that no longer exists is dropped). The cursor is the next results page and cannot go past 11. When the search provider is busy or asks for human verification on every try the call fails, costs nothing and can be retried. Look an exact username up with `profile`.",
+   "examples": [
+    {
+     "query": "fitness coach"
+    }
+   ],
+   "group": "instagram",
+   "id": "instagram.search.profiles",
+   "kind": "platform",
+   "method": "GET",
+   "mode": "sync",
+   "one_of": [],
+   "paginated": true,
+   "params": [
+    {
+     "aliases": [
+      "keyword",
+      "q"
+     ],
+     "description": "Profile name, username or keywords.",
+     "location": "query",
+     "name": "query",
+     "required": true,
+     "type": "string"
+    },
+    {
+     "default": true,
+     "description": "Read the first 10 accounts of a page for exact counts, bio, links and picture (on by default). Off returns only what the search result states, much cheaper and faster.",
+     "location": "query",
+     "name": "enrich",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "aliases": [
+      "continuationToken",
+      "continuation_token",
+      "next_max_id",
+      "max_id",
+      "max_cursor",
+      "min_time",
+      "after",
+      "page_token",
+      "pageToken",
+      "paginationToken",
+      "next_page_id",
+      "page"
+     ],
+     "description": "Opaque cursor from the previous page; pass it back unchanged.",
+     "location": "query",
+     "name": "cursor",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Smaller response: drops null fields and `extra`.",
+     "location": "query",
+     "name": "trim",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Also return the platform's original object as `raw`.",
+     "location": "query",
+     "name": "raw",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "aliases": [
+      "cache_max_age"
+     ],
+     "common": true,
+     "description": "Serve a cached result fetched within this many days, for 0 credits. ScrapeCreators' `cache_max_age=7d` spelling is accepted too.",
+     "location": "query",
+     "maximum": 30,
+     "minimum": 0,
+     "name": "max_age_days",
+     "required": false,
+     "type": "number"
+    }
+   ],
+   "path": "/v1/instagram/search/profiles",
+   "regional": false,
+   "resource": "search.profiles",
+   "response": "ListPage[Profile]",
+   "status": "ga",
+   "summary": "Instagram profile search",
    "timeout_seconds": 30.0
   },
   {
@@ -5473,7 +5939,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -6698,6 +7164,20 @@
      "type": "string"
     },
     {
+     "description": "The same window as `start_date` in Unix seconds (milliseconds also work). Give it with `end_time`; it wins over the dates.",
+     "location": "query",
+     "name": "start_time",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "description": "Upper bound of the window in Unix seconds; give it with `start_time`.",
+     "location": "query",
+     "name": "end_time",
+     "required": false,
+     "type": "string"
+    },
+    {
      "aliases": [
       "continuationToken",
       "continuation_token",
@@ -6772,7 +7252,7 @@
   },
   {
    "credits": "standard",
-   "description": "Products featured on an Amazon creator storefront, each ASIN once, with the lists, photos and videos that feature it in `extra.posts`. The first page also carries the creator's trending picks (with prices) and `parent`: the creator's profile with socials, curations and lists. 20 posts a page. Creator storefronts only (amazon.com/shop/<name>); brand stores (amazon.com/stores/...) are not supported. The creator's affiliate tags are removed from every URL.",
+   "description": "Products featured on an Amazon creator storefront, each ASIN once, with the lists, photos and videos that feature it in `extra.posts`. The first page carries the creator's trending picks (with prices) and `parent`: the creator's profile with socials, curations and the lists, each with its item count and a preview of its first ASINs (`preview_asins`); from the second page on, the ASINs previewed in list tiles are returned as products, since the lists are not repeated. A storefront page gives an ASIN, an image and, for trending picks, a price; it gives no product title. 20 posts a page. Creator storefronts only (amazon.com/shop/<name>); brand stores (amazon.com/stores/...) are not supported. The creator's affiliate tags are removed from every URL.",
    "examples": [
     {
      "url": "https://www.amazon.com/shop/sydneydelrey"
@@ -6955,7 +7435,7 @@
   },
   {
    "credits": "standard",
-   "description": "Bio, origin, genres, top songs and albums. Apple Music shows no follower or listener counts, so `stats` is empty. `region` is the storefront (default us); a URL carries its own.",
+   "description": "Bio, origin, genres, top songs (20), albums (100), singles (100), music videos (50), playlists (50), similar artists (20) and the latest release. `view` with `offset` pages one of those lists; `extra.next_offsets` says where each list continues. Apple Music shows no follower or listener counts, so `stats` is empty. `region` is the storefront (default us); a URL carries its own.",
    "examples": [
     {
      "url": "https://music.apple.com/us/artist/taylor-swift/159260351"
@@ -6990,6 +7470,29 @@
      "name": "id",
      "required": false,
      "type": "string"
+    },
+    {
+     "description": "Page one list of the artist instead of the first page of each.",
+     "enum": [
+      "top-songs",
+      "full-albums",
+      "singles",
+      "music-videos",
+      "playlists",
+      "similar-artists"
+     ],
+     "location": "query",
+     "name": "view",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "description": "Start of the `view` list; use the `next_offsets` value from the previous answer.",
+     "location": "query",
+     "minimum": 0,
+     "name": "offset",
+     "required": false,
+     "type": "integer"
     },
     {
      "aliases": [
@@ -7384,10 +7887,11 @@
   },
   {
    "credits": "standard",
-   "description": "A paged feed of the user's posts. Pass the DID (ScrapeCreators' `user_id`) for faster lookups.",
+   "description": "A paged feed of the user's posts, 30 a page, replies left out. Reposts are included and marked in `extra.is_repost`, with the original author as author; `reposts=false` leaves them out, so a page can hold fewer than 30. Pass the DID (ScrapeCreators' `user_id`) for faster lookups.",
    "examples": [
     {
-     "handle": "bsky.app"
+     "handle": "bsky.app",
+     "reposts": false
     }
    ],
    "group": "bluesky",
@@ -7408,6 +7912,14 @@
      "name": "handle",
      "required": true,
      "type": "string"
+    },
+    {
+     "default": true,
+     "description": "Set false to leave out the posts the account reposted.",
+     "location": "query",
+     "name": "reposts",
+     "required": false,
+     "type": "boolean"
     },
     {
      "aliases": [
@@ -8019,7 +8531,7 @@
   },
   {
    "credits": "standard",
-   "description": "Email addresses a creator published themselves, each with the URLs where it was seen (`extra.email_sources`, each typed social_profile, link_in_bio, linked_profile or website_page). Reads the creator's bio and links, the link-in-bio pages they link (Linktree, Komi, Pillar, Lnk.Bio, Linkme and other link hubs), the profiles they link, and up to three websites they declare (homepage and contact pages, robots.txt honoured). Addresses are never guessed or checked by sending mail; `kind` is business, management or personal when the address itself says so. `extra.partial` is true when a page failed or was skipped, so an empty result is then not proof that no address exists. Pass a `platform` and `handle`, or a profile `url`.",
+   "description": "Email addresses a creator published themselves, each with the URLs where it was seen (`extra.email_sources`, each typed social_profile, link_in_bio, linked_profile or website_page). Reads the creator's bio and links, the link-in-bio pages they link (Linktree, Komi, Pillar, Lnk.Bio, Linkme and other link hubs), the profiles they link, and up to three websites they declare (homepage and contact pages, robots.txt honoured). Addresses are never guessed or checked by sending mail; `kind` is business, management or personal when the address itself says so. Profiles under the same handle are read too, and a link-in-bio page under it counts when its icons name the creator. `extra.partial` is true when a page failed or was skipped, so an empty result is then not proof that no address exists; an address on a profile or page under a different handle that nothing links to cannot be found. Pass a `platform` and `handle`, or a profile `url`.",
    "examples": [
     {
      "handle": "miguelangeles",
@@ -8127,7 +8639,7 @@
   },
   {
    "credits": "standard",
-   "description": "The social profiles a creator links from their own bio, links section or link-in-bio page, each as a profile with its platform and URL; `extra.evidence` lists the pages that say so and `extra.confidence` is 1.0 for a link on the profile itself, 0.9 for one a link-in-bio page or a linked profile declares. Only links the creator published are followed; nothing is guessed from a matching handle. Pass a `platform` and a bare `handle` (a leading @ is optional; YouTube also takes a channel id), or a profile `url`.",
+   "description": "The social profiles a creator links from their own bio, links section or link-in-bio page, each as a profile with its platform and URL; `extra.evidence` lists the pages that say so and `extra.confidence` is 1.0 for a link on the profile itself, 0.9 for one a link-in-bio page or a linked profile declares. Links the creator published are followed; a network they did not link is tried under the same handle and kept only when that profile links back to one already found (0.95, evidence profile_links_back) or shows the same display name (0.8, same_handle_same_name). A handle match alone is dropped. Pass a `platform` and a bare `handle` (a leading @ is optional; YouTube also takes a channel id), or a profile `url`.",
    "examples": [
     {
      "handle": "MrBeast",
@@ -8443,7 +8955,7 @@
    "description": "Events matching a name or description, as facebook.com/events/search shows them (about 7 on the first page). There is no place filter: `location` is searched as words after the query.",
    "examples": [
     {
-     "location": "Austin, TX",
+     "location": "Austin",
      "query": "jazz"
     }
    ],
@@ -9329,7 +9841,7 @@
   },
   {
    "credits": "standard",
-   "description": "Comments on a post or reel: text, time, reply and reaction counts, author and attachments.",
+   "description": "Comments on a post or reel: text, time, reply and reaction counts, author and attachments. `sort` is top (Facebook's ranking, the default), newest or oldest.",
    "examples": [
     {
      "url": "https://www.facebook.com/reel/2166091230582141/"
@@ -9359,6 +9871,24 @@
      "name": "url",
      "required": false,
      "type": "url"
+    },
+    {
+     "aliases": [
+      "sort_by",
+      "sortBy",
+      "order"
+     ],
+     "default": "top",
+     "description": "Order of results. Changing it restarts the cursor chain.",
+     "enum": [
+      "top",
+      "newest",
+      "oldest"
+     ],
+     "location": "query",
+     "name": "sort",
+     "required": false,
+     "type": "string"
     },
     {
      "description": "The post's feedback id (from `post`); using it instead of `url` makes the request much faster.",
@@ -9461,7 +9991,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -10232,7 +10762,7 @@
   },
   {
    "credits": "standard",
-   "description": "GitHub's public Trending page: ranked repositories with description, language, stars, forks, stars gained in the range and the users who built them.",
+   "description": "GitHub's public Trending page: ranked repositories with description, language, stars, forks, stars gained in the range and the users who built them. `watchers` is empty on trending items; the Trending page does not show it (`github.repository` returns it).",
    "examples": [
     {
      "language": "python",
@@ -10961,7 +11491,7 @@
   },
   {
    "credits": "standard",
-   "description": "A user's public repositories with description, language, stars, forks, topics, license and dates, 30 a page. `type` and `direction` pass straight through to GitHub.",
+   "description": "A user's public repositories with description, language, stars, forks, topics, license and dates, 30 a page. `type` and `direction` pass straight through to GitHub. `watchers` is empty on list items: GitHub sends the real watcher count only with a single repository (`github.repository`); the `watchers_count` in a list is the star count, so it is not copied.",
    "examples": [
     {
      "handle": "torvalds"
@@ -11107,6 +11637,108 @@
   },
   {
    "credits": "standard",
+   "description": "Organic web search results with URL, title, description, displayed URL and, when the page prints one, its date. The results come from Yahoo Japan's search (search.yahoo.co.jp), not from google.com: the order, some URLs and some snippets differ from Google's own page. Measured against stored real Google first pages for 18 searches, 5.5 of 8.7 URLs on average were also on Google's page (63%, from 2 to 8; the first result was the same on 12 of 22 tries). Organic results only: no ads, answer boxes or related searches. `date_posted` takes hour, day, week, month or year. The cursor is the next page, 1 to 10 of about 10 results each; `page` works as the cursor. There is no region or language option, and searches for places near you follow our servers' location, not yours. When the search provider refuses every try the call fails and can be retried.",
+   "examples": [
+    {
+     "query": "social media api"
+    }
+   ],
+   "group": "google",
+   "id": "google.search",
+   "kind": "platform",
+   "method": "GET",
+   "mode": "sync",
+   "one_of": [],
+   "paginated": true,
+   "params": [
+    {
+     "aliases": [
+      "keyword",
+      "q"
+     ],
+     "description": "Search terms.",
+     "location": "query",
+     "name": "query",
+     "required": true,
+     "type": "string"
+    },
+    {
+     "description": "Only results from this window.",
+     "enum": [
+      "hour",
+      "day",
+      "week",
+      "month",
+      "year"
+     ],
+     "location": "query",
+     "name": "date_posted",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "aliases": [
+      "continuationToken",
+      "continuation_token",
+      "next_max_id",
+      "max_id",
+      "max_cursor",
+      "min_time",
+      "after",
+      "page_token",
+      "pageToken",
+      "paginationToken",
+      "next_page_id",
+      "page"
+     ],
+     "description": "Opaque cursor from the previous page; pass it back unchanged.",
+     "location": "query",
+     "name": "cursor",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Smaller response: drops null fields and `extra`.",
+     "location": "query",
+     "name": "trim",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "common": true,
+     "default": false,
+     "description": "Also return the platform's original object as `raw`.",
+     "location": "query",
+     "name": "raw",
+     "required": false,
+     "type": "boolean"
+    },
+    {
+     "aliases": [
+      "cache_max_age"
+     ],
+     "common": true,
+     "description": "Serve a cached result fetched within this many days, for 0 credits. ScrapeCreators' `cache_max_age=7d` spelling is accepted too.",
+     "location": "query",
+     "maximum": 30,
+     "minimum": 0,
+     "name": "max_age_days",
+     "required": false,
+     "type": "number"
+    }
+   ],
+   "path": "/v1/google/search",
+   "regional": false,
+   "resource": "search",
+   "response": "ListPage[SearchResult]",
+   "status": "ga",
+   "summary": "Google-style web search results",
+   "timeout_seconds": 30.0
+  },
+  {
+   "credits": "standard",
    "description": "",
    "examples": [
     {
@@ -11202,7 +11834,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -12175,7 +12807,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -13037,7 +13669,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -13095,7 +13727,7 @@
   },
   {
    "credits": "standard",
-   "description": "Posts across Reddit, found through DuckDuckGo's index and in DuckDuckGo's order, each filled in from Reddit with its score and counts. Reddit's own search and comment search are not available.",
+   "description": "Reddit's own search across all of Reddit, in the order you pick (relevance, hot, top, new or most comments), over a timeframe if you give one. A page gives about 25 posts with title, author, subreddit, date, score and comment count, and the post's body text and media. The cursor continues the same search. Posts only: comment search is not available. If Reddit's search is not answering, the posts come from DuckDuckGo's index instead, in its order, and each post's `extra.source` says `duckduckgo`.",
    "examples": [
     {
      "query": "mechanical keyboard"
@@ -13122,15 +13754,37 @@
     },
     {
      "aliases": [
+      "sort_by",
+      "sortBy",
+      "order"
+     ],
+     "default": "relevance",
+     "description": "Reddit's search order: relevance, hot, top, new, or most comments.",
+     "enum": [
+      "relevance",
+      "hot",
+      "top",
+      "new",
+      "comments"
+     ],
+     "location": "query",
+     "name": "sort",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "aliases": [
       "t",
       "time"
      ],
-     "description": "Only posts from this window.",
+     "description": "Keep only the posts from this window.",
      "enum": [
+      "hour",
       "day",
       "week",
       "month",
-      "year"
+      "year",
+      "all"
      ],
      "location": "query",
      "name": "timeframe",
@@ -13409,7 +14063,7 @@
   },
   {
    "credits": "standard",
-   "description": "Posts in one subreddit, found through DuckDuckGo's index and in DuckDuckGo's order, each filled in from Reddit with its score and counts. Reddit's own search and comment search are not available.",
+   "description": "Reddit's own search inside one subreddit, in the order you pick (relevance, hot, top, new or most comments), over a timeframe if you give one. A page gives about 25 posts with title, author, subreddit, date, score and comment count, and the post's body text and media. The cursor continues the same search. If Reddit's search is not answering, the posts come from DuckDuckGo's index instead, in its order, and each post's `extra.source` says `duckduckgo`.",
    "examples": [
     {
      "query": "asyncio",
@@ -13447,15 +14101,37 @@
     },
     {
      "aliases": [
+      "sort_by",
+      "sortBy",
+      "order"
+     ],
+     "default": "relevance",
+     "description": "Reddit's search order: relevance, hot, top, new, or most comments.",
+     "enum": [
+      "relevance",
+      "hot",
+      "top",
+      "new",
+      "comments"
+     ],
+     "location": "query",
+     "name": "sort",
+     "required": false,
+     "type": "string"
+    },
+    {
+     "aliases": [
       "t",
       "time"
      ],
-     "description": "Only posts from this window.",
+     "description": "Keep only the posts from this window.",
      "enum": [
+      "hour",
       "day",
       "week",
       "month",
-      "year"
+      "year",
+      "all"
      ],
      "location": "query",
      "name": "timeframe",
@@ -13914,7 +14590,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -14028,7 +14704,7 @@
   },
   {
    "credits": "standard",
-   "description": "One public Spotlight video by link: id, description, creator, engagement counts, thumbnail and content URL, where Snapchat shows them.",
+   "description": "One public Spotlight video by link: id, description, creator, engagement counts, length to the millisecond, thumbnail and content URL, where Snapchat shows them.",
    "examples": [
     {
      "url": "https://www.snapchat.com/@jack.scalise/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYb3djZ3FqY2VhAZXDhShdAZXDhPWfAAAAAQ"
@@ -14263,7 +14939,7 @@
   },
   {
    "credits": "standard",
-   "description": "An artist's public tracks, newest first, up to 20 a page (private or blocked tracks are left out, so a page can be shorter); `parent` is the artist. Pass the cursor back until it is null.",
+   "description": "An artist's tracks, newest first, 20 or a few more a page (private or blocked tracks are left out and the page is topped up to at least 20 while more exist); `parent` is the artist. Pass the cursor back until it is null.",
    "examples": [
     {
      "handle": "flume"
@@ -14433,7 +15109,7 @@
   },
   {
    "credits": "standard",
-   "description": "The album with its tracks (up to 200), label, copyright and release date.",
+   "description": "The album with its tracks (up to 200), label, copyright, release date and popularity (0 to 100, in `extra`).",
    "examples": [
     {
      "id": "5AEDGbliTTfjOB8TSm1sxt"
@@ -14513,7 +15189,7 @@
   },
   {
    "credits": "standard",
-   "description": "Followers, monthly listeners, world rank, top cities, bio, links, top tracks, albums, singles, related artists and playlists (in `extra`). Spotify has no handles: `id` is the 22 character id.",
+   "description": "Followers, monthly listeners, world rank, popularity, top cities, bio, links, top tracks, the whole discography (up to 500 albums, 500 singles and 500 compilations, in `extra`), music videos (the first 100), related artists and playlists. Spotify has no handles: `id` is the 22 character id.",
    "examples": [
     {
      "url": "https://open.spotify.com/artist/06HL4z0CvFAxyc27GXpf02"
@@ -14774,7 +15450,7 @@
   },
   {
    "credits": "standard",
-   "description": "A show's episodes, 20 a page, in the order Spotify lists them (type \"episode\"); `parent` is the show. Pass the cursor back until it is null.",
+   "description": "A show's episodes, 100 a page, in the order Spotify lists them (type \"episode\"); an episode Spotify withholds comes back as a stub with `extra.restricted` true; `parent` is the show. Pass the cursor back until it is null.",
    "examples": [
     {
      "id": "4rOoJ6Egrf8K2IrywzwOMk"
@@ -14875,7 +15551,7 @@
   },
   {
    "credits": "standard",
-   "description": "Tracks, artists, albums, playlists, podcasts, episodes and audiobooks. Without `type` every kind is returned, 10 of each; with `type`, 20 of that kind. Use `type=show` to find podcast ids. Episodes come back as songs with `extra.type` \"episode\", audiobooks as collections. Results follow the country of the server's IP; `region` is accepted but does not change them.",
+   "description": "Tracks, artists, albums, playlists, podcasts, episodes, audiobooks, genres and users. Without `type` every kind is returned, 10 of each; with `type`, 20 of that kind. Use `type=show` to find podcast ids. Episodes come back as songs with `extra.type` \"episode\", audiobooks as collections with `extra.type` \"audiobook\", genres as collections of kind \"topic\" with `extra.type` \"genre\", users as profiles with `extra.type` \"user\". Results follow the country of the server's IP; `region` is accepted but does not change them.",
    "examples": [
     {
      "query": "taylor swift"
@@ -14909,7 +15585,9 @@
       "playlist",
       "show",
       "episode",
-      "audiobook"
+      "audiobook",
+      "genre",
+      "user"
      ],
      "location": "query",
      "name": "type",
@@ -14991,7 +15669,7 @@
   },
   {
    "credits": "standard",
-   "description": "Title, artists, album, duration, lifetime play count and the 30 second preview URL.",
+   "description": "Title, artists, album, duration, lifetime play count, popularity (0 to 100, in `extra`) and the 30 second preview URL.",
    "examples": [
     {
      "id": "4cOdK2wGLETKBW3PvgPWqT"
@@ -15651,7 +16329,7 @@
   },
   {
    "credits": "standard",
-   "description": "Accounts matching a query. There is no direct account search, so these are the authors of the search results whose handle or name matches, best match first, plus the account whose handle is the query itself.",
+   "description": "Accounts matching a query, best match first: handle, name, avatar and verified flag, up to 10.",
    "examples": [
     {
      "query": "nasa"
@@ -16492,7 +17170,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -17387,7 +18065,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -18056,7 +18734,7 @@
       "allowLongTranscription"
      ],
      "default": false,
-     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers transcript_unavailable, which is free.",
+     "description": "Transcribe audio past 2 minutes with AI, at 5 credits per started minute of the whole video. Without it a longer video answers invalid_params naming the cost, which is free.",
      "location": "query",
      "name": "allow_long_transcription",
      "required": false,
@@ -18155,7 +18833,7 @@
    "retryable": false
   },
   "rate_limited": {
-   "description": "Free accounts only: requests are arriving faster than the free limit; wait for Retry-After.",
+   "description": "Requests are arriving faster than we accept; wait for Retry-After.",
    "http_status": 429,
    "retryable": true
   },
@@ -18191,12 +18869,12 @@
   },
   "upstream_changed": {
    "description": "The platform's response no longer parses; we are fixing it.",
-   "http_status": 502,
+   "http_status": 503,
    "retryable": false
   },
   "upstream_error": {
    "description": "The platform returned an error or the connection failed.",
-   "http_status": 502,
+   "http_status": 503,
    "retryable": true
   },
   "upstream_rate_limited": {
@@ -18206,7 +18884,7 @@
   },
   "upstream_timeout": {
    "description": "The platform did not answer in time.",
-   "http_status": 504,
+   "http_status": 503,
    "retryable": true
   }
  },
@@ -18287,6 +18965,13 @@
    "owner": "github",
    "platform_enum": true,
    "title": "GitHub"
+  },
+  {
+   "description": "Data from Google.",
+   "key": "google",
+   "owner": "google",
+   "platform_enum": true,
+   "title": "Google"
   },
   {
    "description": "Data from Kick: transcripts, posts and videos.",
@@ -18719,6 +19404,16 @@
    "image_urls",
    "extra"
   ],
+  "SearchResult": [
+   "platform",
+   "position",
+   "title",
+   "url",
+   "displayed_url",
+   "snippet",
+   "kind",
+   "extra"
+  ],
   "Song": [
    "platform",
    "id",
@@ -18856,10 +19551,18 @@
      "search.videos": "facebook.search.videos"
     }
    },
-   "instagram": {
-    "default": "search.popular",
+   "google": {
+    "default": "search",
     "kinds": {
+     "search": "google.search"
+    }
+   },
+   "instagram": {
+    "default": "search",
+    "kinds": {
+     "search": "instagram.search",
      "search.popular": "instagram.search.popular",
+     "search.profiles": "instagram.search.profiles",
      "search.reels": "instagram.search.reels"
     }
    },

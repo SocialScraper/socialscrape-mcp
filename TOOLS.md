@@ -1,6 +1,6 @@
 # MCP tools (generated)
 
-38 tools by default. Generated from the endpoint registry by `sdks/mcp/generate.py`.
+39 tools by default. Generated from the endpoint registry by `sdks/mcp/generate.py`.
 Narrow the list with `SOCIALSCRAPE_PLATFORMS` / `SOCIALSCRAPE_TOOLSETS`; see README.md.
 
 ## `get_transcript` (core)
@@ -9,7 +9,7 @@ Get the transcript of a video or audio post from its URL. The platform is detect
 
 ## `search` (core)
 
-Search one platform for posts, videos, users or other items by keyword. Platforms: YouTube, TikTok, Instagram, Apple Music, Cosmos, Facebook, LinkedIn, Pinterest, Reddit, Rumble, Spotify, Threads, X (Twitter). Price: 1 credit per call (failures free, cached repeats free with max_age_days). For anything beyond this, use the platform's own tool. Kinds per platform: youtube: channel.search, search, search.typeahead; tiktok: search.keyword, search.suggestions, search.top, search.users; instagram: search.popular, search.reels; facebook: events.search, search.videos; reddit: search, subreddit.search; threads: search, search.users.
+Search one platform for posts, videos, users or other items by keyword. Platforms: YouTube, TikTok, Instagram, Apple Music, Cosmos, Facebook, Google, LinkedIn, Pinterest, Reddit, Rumble, Spotify, Threads, X (Twitter). Price: 1 credit per call (failures free, cached repeats free with max_age_days). For anything beyond this, use the platform's own tool. Kinds per platform: youtube: channel.search, search, search.typeahead; tiktok: search.keyword, search.suggestions, search.top, search.users; instagram: search, search.popular, search.profiles, search.reels; facebook: events.search, search.videos; reddit: search, subreddit.search; threads: search, search.users.
 
 ## `get_profile` (core)
 
@@ -29,7 +29,7 @@ Look up what SocialScrape can fetch, with exact parameters, allowed values, pric
 
 ## `call_endpoint` (core)
 
-Run any SocialScrape data endpoint by its id (for example `youtube.channel`). Same behaviour and price as the platform tools; use it when you already know the id, or when only the core tools are enabled. 183 endpoints; call describe to list them.
+Run any SocialScrape data endpoint by its id (for example `youtube.channel`). Same behaviour and price as the platform tools; use it when you already know the id, or when only the core tools are enabled. 189 endpoints; call describe to list them.
 
 ## `get_credits` (core)
 
@@ -83,7 +83,10 @@ Resources:
 - collection.videos(url): TikTok collection videos. 1 credit. Paged.
 - live(url|id): TikTok live room info. 1 credit. Optional: user_id.
 - profile(handle|id): TikTok profile. 1 credit.
+- profile.followers(handle|id): TikTok followers. 1 credit. Paged.
+- profile.following(handle|id): TikTok following. 1 credit. Paged.
 - profile.live(handle): Is a TikTok user live. 1 credit.
+- profile.region(handle): TikTok profile region. 1 credit.
 - profile.videos(handle|id): TikTok profile videos. 1 credit. Paged. Optional: include_pinned.
 - search.hashtag(hashtag): TikTok videos by hashtag. 1 credit. Paged.
 - search.keyword(query): TikTok video search. 1 credit. Paged. Optional: date_posted.
@@ -111,15 +114,17 @@ Resources:
 - post(url|id): Instagram post or reel details. 1 credit. Optional: include_play_count.
 - post.comments(url|id): Instagram post comments. 1 credit. Paged. Optional: include_replies.
 - post.transcript(url|id): Instagram reel transcript. 1 credit (captions); AI transcription 1 credit up to 2 minutes, then 5 per started minute of the whole video. Optional: allow_long_transcription.
-- profile(handle): Instagram profile. 1 credit.
+- profile(handle): Instagram profile. 1 credit. Optional: include_post_count.
 - profile.embed(handle): Instagram profile embed HTML. 1 credit.
 - profile.highlights(handle|id): Instagram story highlights. 1 credit. Paged.
 - profile.post_count(handle): Instagram profile post count. 1 credit. Optional: allow_estimated.
 - profile.posts(handle|id): Instagram profile posts. 1 credit. Paged. Optional: require_play_counts.
 - profile.reels(handle|id): Instagram profile reels. 1 credit. Paged. Optional: require_play_counts.
 - reels.trending(): Instagram trending reels. 1 credit. Paged.
+- search(query): Instagram hashtag suggestions. 1 credit. Paged.
 - search.hashtag(hashtag): Instagram posts by hashtag. 1 credit. Paged. Optional: date_posted, media_type, enrich.
 - search.popular(query): Instagram popular topic. 1 credit. Paged.
+- search.profiles(query): Instagram profile search. 1 credit. Paged. Optional: enrich.
 - search.reels(query): Instagram reel search. 1 credit. Paged. Optional: date_posted.
 - song.reels(id): Instagram reels using a song. 1 credit. Paged.
 
@@ -141,7 +146,7 @@ Resources:
 - linkedin.ad(url|id): LinkedIn Ad Library ad details. 1 credit.
 - linkedin.search(): LinkedIn Ad Library search. 1 credit. Paged. Optional: company, company_id, countries, start_date, end_date.
 - tiktok.ad(id|url): TikTok Ad Library ad details. 1 credit.
-- tiktok.search(query|advertiser_name): TikTok Ad Library search. 1 credit. Paged. Optional: adv_biz_ids, start_date, end_date.
+- tiktok.search(query|advertiser_name): TikTok Ad Library search. 1 credit. Paged. Optional: adv_biz_ids, start_date, end_date, start_time, end_time.
 
 ## `amazon` (platforms)
 
@@ -160,7 +165,7 @@ Pick a `resource`, then pass its parameters as top-level arguments (extras in `p
 
 Resources:
 - album(url|id): Apple Music album. 1 credit.
-- artist(url|id): Apple Music artist. 1 credit.
+- artist(url|id): Apple Music artist. 1 credit. Optional: view, offset.
 - search(query): Apple Music search. 1 credit. Paged. Optional: type.
 - track(url|id): Apple Music track. 1 credit.
 
@@ -173,7 +178,7 @@ Pick a `resource`, then pass its parameters as top-level arguments (extras in `p
 Resources:
 - post(url): Bluesky post. 1 credit.
 - profile(handle): Bluesky profile. 1 credit.
-- profile.posts(handle): Bluesky profile posts. 1 credit. Paged.
+- profile.posts(handle): Bluesky profile posts. 1 credit. Paged. Optional: reposts.
 
 ## `cosmos` (platforms)
 
@@ -243,6 +248,15 @@ Resources:
 - user.following(handle|url): GitHub following. 1 credit. Paged.
 - user.pull_requests(handle|url): GitHub pull requests by a user. 1 credit. Paged. Optional: state, since, until.
 - user.repositories(handle|url): GitHub user repositories. 1 credit. Paged. Optional: type, direction.
+
+## `google` (platforms)
+
+Data from Google.
+
+Pick a `resource`, then pass its parameters as top-level arguments (extras in `params`). Each call costs the credits shown below and the result says what was charged and what is left; failures are free. List resources return a `cursor`: pass it back unchanged for the next page. Pass max_age_days to accept a cached copy for free.
+
+Resources:
+- search(query): Google-style web search results. 1 credit. Paged. Optional: date_posted.
 
 ## `kick` (platforms)
 
